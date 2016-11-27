@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
-import os
+import os, textcolors
 from os.path import expanduser
-import textcolors
 from subprocess import Popen, PIPE, STDOUT
 
 def eipcheck():

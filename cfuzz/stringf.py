@@ -1,9 +1,6 @@
 # -*- coding: UTF-8 -*-
-import os
-import subprocess
-import textcolors
+import os, subprocess, textcolors, exskele
 from subprocess import Popen, PIPE, STDOUT
-import exskele
 from time import sleep
 
 def checkstrng( args, fpath, skeleton, delay ):

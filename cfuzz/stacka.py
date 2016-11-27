@@ -1,12 +1,8 @@
 # -*- coding: UTF-8 -*-
-import textcolors
-import os
-import sys
+import textcolors, os, sys, exskele, socket
 from os.path import expanduser
 from subprocess import Popen, PIPE, STDOUT
 from time import sleep
-import exskele
-import socket
 
 def stackeipcheckA( fpath, buff ):
      textcolors.colortext( "--- Searching for EIP.", textcolors.HEADER, 'print' )
