@@ -1,4 +1,4 @@
-Modules Include - 
+#Modules Include - 
 /usr/lib/python2.7/dist-packages/textcolors.py
 Logs in ~/.cfuzz/logs
 Custom Modules in ~/.cfuzz/modules
