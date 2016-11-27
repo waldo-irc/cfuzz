@@ -9,8 +9,6 @@ Logs in ~/.cfuzz/logs
 
 Custom Modules in ~/.cfuzz/modules?
 
-&nbsp;
-
 ###Required Repos
 gdb (debugging to EIP point)
 msf (msfvenom, pattern_create, pattern_offset)
