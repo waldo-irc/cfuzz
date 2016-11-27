@@ -28,5 +28,3 @@ Network fuzzing over port, use python Sockets
 --Localhost hosting scans 'exec /usr/bin/socat tcp4-l:$port,fork,reuseaddr exec:/filename'
 
 --Make sure to check port is open and app is running before continuing
-
-Make a -msf command to create an msfvenom payload
