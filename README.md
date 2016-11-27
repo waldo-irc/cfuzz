@@ -14,7 +14,7 @@ gdb (debugging to EIP point)
 msf (msfvenom, pattern_create, pattern_offset)
 socat (hosting)
 
-###To Add to script
+###ToDo
 MAYBE: Full scan check
 
 Properly setup verbose error output and commenting + full logging of errors into output file
