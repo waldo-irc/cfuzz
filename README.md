@@ -1,13 +1,12 @@
-#Modules Include - 
+#Cfuzz
+##A C Application fuzzer built in python.
+
+###Modules Include - 
 /usr/lib/python2.7/dist-packages/textcolors.py
 Logs in ~/.cfuzz/logs
 Custom Modules in ~/.cfuzz/modules
 
-Create bash install script for quick/easy install
-Create README.md
-Add to github
-
-###Required Repos###
+###Required Repos
 gdb (debugging to EIP point)
 msf (msfvenom, pattern_create, pattern_offset)
 socat (hosting)
