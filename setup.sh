@@ -8,7 +8,7 @@ fi
 if [ ! -d "/usr/lib/python2.7/dist-packages/cfuzz" ]; then
     echo "[-] Setting up python modules in '/usr/lib/python2.7/dist-packages/cfuzz/'."
     mkdir /usr/lib/python2.7/dist-packages/cfuzz/
-    cp -R ./modules/* /usr/lib/python2.7/dist-packages/cfuzz/
+    cp -R ./cfuzz/* /usr/lib/python2.7/dist-packages/cfuzz/
 else
     echo "Required modules already exist"
 fi
@@ -30,9 +30,3 @@ else
 fi
 
 echo "[✓] Installation completed successfully, you can delete this folder now!  Run cfuzz -h to get started."
-
-read -p "Clean up and remove installation? [y/N]: " CONDITION;
-if [ "$CONDITION" == "y" ] || [ "$CONDITION" == "Y" ]; then
-    rm *
-    cd ../
-fi
