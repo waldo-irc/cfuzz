@@ -1,0 +1,196 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import textcolors, argparse, os, sys, re
+from modules import stringf, stacka, exskele
+from os.path import expanduser
+
+''' Directory checks '''
+if not os.path.isdir(os.path.join(os.path.expanduser('~'),'.cfuzz')):
+     os.system("mkdir ~/.cfuzz")
+if not os.path.isdir(os.path.join(os.path.expanduser('~'),'.cfuzz/logs')):
+     os.system("mkdir ~/.cfuzz/logs")
+
+''' Here we set up logging '''
+class Logger(object):
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/log.txt'), "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        #this flush method is needed for python 3 compatibility.
+        #this handles the flush command by doing nothing.
+        #you might want to specify some extra behavior here.
+        pass
+
+sys.stdout = Logger()
+
+''' Just a function that returns completion '''
+def completion():
+     ''' Signal Completion '''
+     textcolors.colortext( "Execution completed.", textcolors.GREEN, 'print' )
+
+''' Start argument parsing '''
+parser = argparse.ArgumentParser(description='Fuzz C applications for String Format Overflows and Stack Overflows and create custom skeletons on findings.')
+parser.add_argument('progname', metavar='execname', type=str, nargs='+', help='A file to fuzz')
+parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
+parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz', action="store")
+parser.add_argument('--windows', dest='windows', default=False, help='Fuzz a windows binary, must have Wine installed.', action="store_true")
+parser.add_argument("--wipe", help="Wipe logs for %(prog)s", default=False, action="store_true", dest='wipe')
+parser.add_argument("-a", help="Check for segmentation faults terminal arguments.", nargs='?', type=str, default=False, action="store", dest="afield")
+parser.add_argument("-ai", help="Check for segmentation faults in application input.", nargs='?', type=str, default=False, action="store", dest="aifield")
+parser.add_argument("-s", help="Check for segmentation faults with string format overflow using terminal arguments.", nargs='?', type=str, default=False, action="store", dest="sfield")
+parser.add_argument("-si", help="Check for segmentation faults with string format overflow in application input.", nargs='?', type=str, default=False, action="store", dest="sifield")
+parser.add_argument("-wE", help="Write an exploit skeleton.", type=str, default=False, action="store", dest="exfilename")
+parser.add_argument("-eip", help="Search for EIP as well.", default=False, action="store_true", dest="eip")
+parser.add_argument("-d", help="Add a delay.", type=int, default=False, action="store", dest="delay")
+args = parser.parse_args()
+
+if args.wipe:
+     textcolors.colortext( "Wipings logs located at '~/.cfuzz/logs'", textcolors.HEADER, 'print' )
+     os.system("echo '' > ~/.cfuzz/logs/log.txt; echo '' > ~/.cfuzz/logs/latest-log.txt ")
+
+if args.delay is not False and args.afield is False and args.aifield is False and args.sfield is False and args.sifield is False:
+     textcolors.error( "Delay requires an argument of -a, -ai, -s, or -si." ,1,'print' )
+     exit(0)
+
+if args.afield is False and args.aifield is False and args.sfield is False and args.sifield is False:
+     textcolors.error('Must supply a scan type of -a, -ai, -s, or -si.',2,'print')
+     exit(0)
+
+''' Set only 1 arg at a time '''
+if args.afield is not False and (args.aifield or args.sfield or args.sifield) is not False:
+    textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
+    exit(0)
+if args.aifield is not False and (args.afield or args.sfield or args.sifield) is not False:
+    textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
+    exit(0)
+if args.sfield is not False and (args.afield or args.aifield or args.sifield) is not False:
+    textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
+    exit(0)
+if args.sifield is not False and (args.afield or args.afield or args.sfield) is not False:
+    textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
+    exit(0)
+''' End Arg limiting'''
+
+if args.port and (args.port > 65535 or args.port <= 0):
+     textcolors.error( "Error, port chosen out of range!", 3, 'print' )
+     exit(0)
+
+if args.host is not False:
+     if args.host.lower() == 'run' or args.host.lower() == 'host':
+          pass
+     else:
+          textcolors.error( "Host argument must be =run or =host.", 2, 'print' )
+          exit(0)
+
+if args.host is not False and args.port is False:
+     textcolors.error( "Must specify a port with -port=.", 2, 'print' )
+     exit(0)
+
+if (args.host is not False and args.afield is not False) or (args.host is not False and args.sfield is not False):
+     textcolors.error( "Can only use with -ai or -si.", 2, 'print' )
+     exit(0)
+
+if (args.eip is not False and args.sfield is not False) or (args.eip is not False and args.sifield is not False):
+     textcolors.error( "Can only search for eip with -a or -ai.", 2, 'print' )
+     exit(0)
+
+if args.delay is not False:
+     textcolors.colortext( "Running with %s second delay." % args.delay, textcolors.WARNING,'print')
+
+
+''' Setting up base variables '''
+#progname = sys.argv[1]
+progname = args.progname[0]
+buffer = ["A"]
+counter = 100
+segfault = 'False'
+
+''' Getting path prepared for execution and checks '''
+if '/' in progname:
+     fpath = '%s' % progname
+else:
+     fpath = './%s' % progname
+
+if not os.path.isfile(fpath):
+     textcolors.error( 'File %s doesn\'t seem to exist' % progname, 2, 'print' )
+     exit(0)
+
+''' Double check before execution and ensure file is an executable '''
+if os.access(fpath, os.X_OK):
+     textcolors.colortext( 'Continue fuzzing file "%s"? [y/N]> ' % fpath, textcolors.GREEN )
+     conf = raw_input(textcolors.colormsg)
+     fconf = conf.lower()
+else:
+     textcolors.error( 'File "%s" doesn\'t seem like an executable, really continue? [y/N]> ' % progname, 1 )
+     conf = raw_input(textcolors.errmess)
+     fconf = conf.lower()
+
+if 'y' in fconf:
+     pass
+else:
+     textcolors.colortext( "Exiting %s" % sys.argv[0], textcolors.FAIL, 'print')
+     exit(0)
+
+''' Fuzz begins here '''
+textcolors.colortext( 'Starting Fuzz of "%s" now!' % fpath, textcolors.HEADER, 'print' )
+
+''' Clear latest-log to prepare for new entries - this log is for checking seg faults '''
+with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'w+') as myfile:
+     myfile.write('')
+
+''' Preparing fuzzing buffer '''
+while len(buffer) <= 30:
+     buffer.append("A"*counter)
+     counter=counter+200
+
+''' Run a scan based on argument supplied.  We use try to output a special message on KeyExit '''
+try:
+     if args.sifield is not False:
+          stringf.checkstrng( args.sifield, fpath, args.exfilename, args.delay )
+     elif args.sfield is not False:
+          stringf.checkstrngB( args.sfield, fpath, args.exfilename, args.delay )
+
+     for string in buffer:
+          if args.afield is not False:
+               stacka.mainstack( fpath, args.afield, string, args.delay )
+          elif args.aifield is not False:
+               stacka.altstack( fpath, args.aifield, string, args.delay, args.host, args.port )
+          elif args.sifield is not False or args.sifield is not False:
+               pass
+
+          ''' Here we check to see if a segfault was detected '''
+          with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'r') as myfile:
+               for line in myfile:
+                    if 'Segmentation fault' in line:
+                         textcolors.colortext( "[✓✓✓] Seg Fault seems to have occured at %s bytes!" % len(string), textcolors.BOLD, 'print'  )
+                         buff = len(string)
+                         segfault = 'True'
+                         break
+               else:
+                    continue
+               break
+
+     ''' Check if -wE argument is true to create the stack based exploit skeleton '''
+     if args.exfilename is not False and args.afield is not False and segfault == 'True':
+          exskele.exdev( args.afield,args.exfilename,buff,fpath,args.eip )
+     if args.exfilename is not False and args.aifield is not False and segfault == 'True':
+          exskele.exdev2( args.aifield,args.exfilename,buff,fpath,args.eip )
+     elif args.exfilename is not False and (args.afield is not False or args.aifield is not False ) and segfault == 'False':
+          textcolors.error( "No segfault found for exploit creation", 1, 'print')
+
+     if args.eip is not False and segfault == 'True' and args.exfilename is False and args.afield is not False:
+          stacka.stackeipcheckA( fpath, buff )
+     elif args.eip is not False and segfault == 'True' and args.exfilename is False and args.aifield is not False:
+          stacka.stackeipcheckB( fpath, buff )
+
+     completion()
+     exit(0)
+
+except KeyboardInterrupt:
+     print '\n'
+     textcolors.colortext( "Exit key detected, closing %s." % sys.argv[0],textcolors.FAIL,'print')
