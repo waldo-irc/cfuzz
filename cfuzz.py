@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import textcolors, argparse, os, sys, re
-from cfuzz import stringf, stacka, exskele
+import argparse, os, sys, re
+from cfuzz import stringf, stacka, exskele, textcolors
 from os.path import expanduser
 
 ''' Directory checks '''
