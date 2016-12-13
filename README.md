@@ -10,8 +10,10 @@ Logs in ~/.cfuzz/logs
 Custom Modules in ~/.cfuzz/modules?
 
 ###Required Repos
-gdb (debugging to EIP point)
+gdb (debugging to EIP point) !!!!! Won't work with GDB-Peda.
+
 msf (msfvenom, pattern_create, pattern_offset)
+
 socat (hosting)
 
 ###ToDo
