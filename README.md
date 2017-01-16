@@ -30,3 +30,5 @@ Network fuzzing over port, use python Sockets
 --Localhost hosting scans 'exec /usr/bin/socat tcp4-l:$port,fork,reuseaddr exec:/filename'
 
 --Make sure to check port is open and app is running before continuing
+
+Please use responsibly and with permission only. I do not condone unauthorized uses and will not be responsible for anything unethical commited with these. 
