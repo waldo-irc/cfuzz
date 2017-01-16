@@ -2,6 +2,8 @@
 ##A C Application fuzzer built in python.
 ####Current version requires python 2.7.  May work with newer versions, currently untested.
 
+Please use responsibly and with permission only. I do not condone unauthorized uses and will not be responsible for anything unethical commited with these. 
+
 ###Modules Include - 
 /usr/lib/python2.7/dist-packages/textcolors.py
 
@@ -31,4 +33,3 @@ Network fuzzing over port, use python Sockets
 
 --Make sure to check port is open and app is running before continuing
 
-Please use responsibly and with permission only. I do not condone unauthorized uses and will not be responsible for anything unethical commited with these. 
