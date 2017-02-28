@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import os, textcolors
+import os, textcolors, commands
 from os.path import expanduser
 from subprocess import Popen, PIPE, STDOUT
 
@@ -26,6 +26,10 @@ def exdev( args,filename,buffer,fpath,eipch ):
                myfile.write("gdb.execute(\"run %s\" % buffer)\n")
                myfile.write("gdb.execute(\"quit\")")
 
+          peda = commands.getoutput( "cat ~/.gdbinit" )
+          if "source ~/peda/peda.py" in peda:
+              os.system("sed -i -e 's/source ~\/peda\/peda.py/#source ~\/peda\/peda.py/g' ~/.gdbinit")
+
           os.system('gdb -q -x ./tmp.py')
 
           eipcheck()
@@ -40,7 +44,7 @@ def exdev( args,filename,buffer,fpath,eipch ):
                textcolors.error( "Something went wrong, can't get EIP for this binary through input." , 3, 'print' )
                exit(0)
 
-          pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb %s' % buffer).read()
+          pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l %s' % buffer).read()
           patternf = pattern.split('\n')[0]
           textcolors.colortext( "Overflowing in GDB with msf pattern.", textcolors.HEADER, 'print')
           with open('./tmp.py', 'w+') as myfile:
@@ -58,7 +62,7 @@ def exdev( args,filename,buffer,fpath,eipch ):
 
           textcolors.colortext( "Finding EIP offset based on overflowed EIP in pattern.", textcolors.HEADER, 'print')
           eipcheck()
-          eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb %s | cut -d\' \' -f6' % eip).read()
+          eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -q %s -l %s | cut -d\' \' -f6' % (eip, buffer)).read()
           eipamtf = int(eipamt.split('\n')[0])
 
           textcolors.colortext( "Writing Exploit with eip offset at %s bytes." % eipamtf, textcolors.HEADER, 'print')
@@ -66,7 +70,7 @@ def exdev( args,filename,buffer,fpath,eipch ):
                myfile.write('#!/usr/bin/python\n')
                myfile.write('# -*- coding: UTF-8 -*-\n')
                myfile.write('import os\n')
-               myfile.write('import textcolors\n')
+               myfile.write('from cfuzz import textcolors\n')
                myfile.write('\n')
                myfile.write('buffer = "A" * %s + "B" * 4 + "C" * (%s - %s - 4)' % (eipamtf,buffer,eipamtf))
                myfile.write('\n')
@@ -79,13 +83,16 @@ def exdev( args,filename,buffer,fpath,eipch ):
 
           textcolors.colortext( "Finished! Cleaning up.", textcolors.HEADER, 'print')
           os.system('rm ./gdb.txt ./tmp.py')
+          peda = commands.getoutput( "cat ~/.gdbinit" )
+          if "#source ~/peda/peda.py" in peda:
+              os.system("sed -i -e 's/#source ~\/peda\/peda.py/source ~\/peda\/peda.py/g' ~/.gdbinit")
           textcolors.colortext( 'Exploit created in working directory as ./%s.py' % filename, textcolors.HEADER, 'print')
      else:
           with open("./%s.py" % filename, 'w') as myfile:
                myfile.write('#!/usr/bin/python\n')
                myfile.write('# -*- coding: UTF-8 -*-\n')
                myfile.write('import os\n')
-               myfile.write('import textcolors\n')
+               myfile.write('from cfuzz import textcolors\n')
                myfile.write('\n')
                myfile.write('buffer = "A" * %s' % (buffer))
                myfile.write('\n')
@@ -117,6 +124,10 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                myfile.write("gdb.execute(\"run < tmp.txt\")\n")
                myfile.write("gdb.execute(\"quit\")")
 
+          peda = commands.getoutput( "cat ~/.gdbinit" )
+          if "source ~/peda/peda.py" in peda:
+              os.system("sed -i -e 's/source ~\/peda\/peda.py/#source ~\/peda\/peda.py/g' ~/.gdbinit")
+
           os.system('gdb -q -x ./tmp.py')
 
           eipcheck()
@@ -133,7 +144,7 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                exit(0)
 
           textcolors.colortext( "Overflowing in GDB with MSF pattern.", textcolors.HEADER, 'print')
-          pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb %s' % buffer).read()
+          pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l %s' % buffer).read()
           patternf = pattern.split('\n')[0]
           with open('./tmp.py', 'w+') as myfile:
                myfile.write("buffer = '%s' \n" % patternf)
@@ -154,14 +165,14 @@ def exdev2( args,filename,buffer,fpath,eipch ):
 
           textcolors.colortext( "Finding EIP offset based on overflowed EIP in pattern.", textcolors.HEADER, 'print')
           eipcheck()
-          eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb %s | cut -d\' \' -f6' % eip).read()
+          eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -q %s -l %s | cut -d\' \' -f6' % (eip, buffer)).read()
           eipamtf = int(eipamt.split('\n')[0])
 
           with open("./%s.py" % filename, 'w') as myfile:
                myfile.write('#!/usr/bin/python\n')
                myfile.write('# -*- coding: UTF-8 -*-\n')
                myfile.write('import os\n')
-               myfile.write('import textcolors\n')
+               myfile.write('from cfuzz import textcolors\n')
                myfile.write('from subprocess import Popen, PIPE, STDOUT\n')
                myfile.write('\n')
                myfile.write('buffer = "A" * %s + "B" * 4 + "C" * (%s-%s-4)' % (eipamtf,buffer,eipamtf))
@@ -176,6 +187,9 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                myfile.write('print(grep_stdout)\n')
 
           os.system('rm ./gdb.txt ./tmp.py ./tmp.txt')
+          peda = commands.getoutput( "cat ~/.gdbinit" )
+          if "#source ~/peda/peda.py" in peda:
+              os.system("sed -i -e 's/#source ~\/peda\/peda.py/source ~\/peda\/peda.py/g' ~/.gdbinit")
           textcolors.colortext( 'Exploit created in working directory as ./%s.py' % filename, textcolors.HEADER, 'print')
 
      else:
@@ -183,7 +197,7 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                myfile.write('#!/usr/bin/python\n')
                myfile.write('# -*- coding: UTF-8 -*-\n')
                myfile.write('import os\n')
-               myfile.write('import textcolors\n')
+               myfile.write('from cfuzz import textcolors\n')
                myfile.write('from subprocess import Popen, PIPE, STDOUT\n')
                myfile.write('\n')
                myfile.write('buffer = "A" * %s' % (buffer))

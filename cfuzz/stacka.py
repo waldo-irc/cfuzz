@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import textcolors, os, sys, exskele, socket
+import textcolors, os, sys, exskele, socket, commands
 from os.path import expanduser
 from subprocess import Popen, PIPE, STDOUT
 from time import sleep
@@ -19,6 +19,10 @@ def stackeipcheckA( fpath, buff ):
           myfile.write("gdb.execute(\"run %s\" % buffer)\n")
           myfile.write("gdb.execute(\"quit\")")
 
+     peda = commands.getoutput( "cat ~/.gdbinit" )
+     if "source ~/peda/peda.py" in peda:
+          os.system("sed -i -e 's/source ~\/peda\/peda.py/#source ~\/peda\/peda.py/g' ~/.gdbinit")
+
      os.system('gdb -q -x ./tmp.py')
 
      exskele.eipcheck()
@@ -35,7 +39,7 @@ def stackeipcheckA( fpath, buff ):
           exit(0)
 
      textcolors.colortext( "Overflowing in GDB with MSF pattern.", textcolors.HEADER, 'print')
-     pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb %s' % buff).read()
+     pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l %s' % buff).read()
      patternf = pattern.split('\n')[0]
      with open('./tmp.py', 'w+') as myfile:
           myfile.write("buffer = '%s' \n" % patternf)
@@ -52,10 +56,13 @@ def stackeipcheckA( fpath, buff ):
 
      textcolors.colortext( "Finding EIP offset based on overflowed EIP in pattern.", textcolors.HEADER, 'print')
      exskele.eipcheck()
-     eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb %s | cut -d\' \' -f6' % exskele.eip).read()
+     eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -q %s -l %s | cut -d\' \' -f6' % (exskele.eip, buff)).read()
      eipamtf = int(eipamt.split('\n')[0])
      textcolors.colortext( "Offset at %s bytes." % eipamtf, textcolors.BLUE, 'print' )
      os.system('rm ./gdb.txt ./tmp.py')
+     peda = commands.getoutput( "cat ~/.gdbinit" )
+     if "#source ~/peda/peda.py" in peda:
+          os.system("sed -i -e 's/#source ~\/peda\/peda.py/source ~\/peda\/peda.py/g' ~/.gdbinit")
 
 def stackeipcheckB( fpath, buff ):
      textcolors.colortext( "--- Searching for EIP.", textcolors.HEADER, 'print' )
@@ -73,6 +80,10 @@ def stackeipcheckB( fpath, buff ):
           myfile.write("gdb.execute(\"run < tmp.txt\")\n")
           myfile.write("gdb.execute(\"quit\")")
 
+     peda = commands.getoutput( "cat ~/.gdbinit" )
+     if "source ~/peda/peda.py" in peda:
+          os.system("sed -i -e 's/source ~\/peda\/peda.py/#source ~\/peda\/peda.py/g' ~/.gdbinit")
+
      os.system('gdb -q -x ./tmp.py')
 
      exskele.eipcheck()
@@ -89,7 +100,7 @@ def stackeipcheckB( fpath, buff ):
           exit(0)
 
      textcolors.colortext( "Overflowing in GDB with MSF pattern.", textcolors.HEADER, 'print')
-     pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb %s' % buff).read()
+     pattern = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l %s' % buff).read()
      patternf = pattern.split('\n')[0]
      with open('./tmp.py', 'w+') as myfile:
           myfile.write("buffer = '%s' \n" % patternf)
@@ -107,10 +118,13 @@ def stackeipcheckB( fpath, buff ):
 
      textcolors.colortext( "Finding EIP offset based on overflowed EIP in pattern.", textcolors.HEADER, 'print')
      exskele.eipcheck()
-     eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb %s | cut -d\' \' -f6' % exskele.eip).read()
+     eipamt = os.popen('/usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -q %s -l %s | cut -d\' \' -f6' % (exskele.eip, buff)).read()
      eipamtf = int(eipamt.split('\n')[0])
      textcolors.colortext( "Offset at %s bytes." % eipamtf, textcolors.BLUE, 'print' )
      os.system('rm ./gdb.txt ./tmp.py ./tmp.txt')
+     peda = commands.getoutput( "cat ~/.gdbinit" )
+     if "#source ~/peda/peda.py" in peda:
+          os.system("sed -i -e 's/#source ~\/peda\/peda.py/source ~\/peda\/peda.py/g' ~/.gdbinit")
 
 def mainstack( fpath, args, string, waittime ):
      textcolors.colortext( "Fuzzing with %s bytes" % len(string), textcolors.BLUE, 'print' )
