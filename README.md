@@ -19,8 +19,6 @@ msf (msfvenom, pattern_create, pattern_offset)
 socat (hosting)
 
 ###ToDo
-MAYBE: Full scan check
-
 Properly setup verbose error output and commenting + full logging of errors into output file
 
 Versatile argument exploitaiton, currently program - arg - ovfrlw or program - ovfrlw, set up so proram - choose arg and ovrfl location
