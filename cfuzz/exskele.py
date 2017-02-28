@@ -11,6 +11,10 @@ def eipcheck():
                     eip = '%s ' % line.split()[0].split('x')[1]
 
 def exdev( args,filename,buffer,fpath,eipch ):
+     textcolors.colortext( "Looking for jmp/call eax.", textcolors.HEADER, 'print')
+     eax = commands.getoutput( "msfelfscan -j eax %s" % fpath )
+     textcolors.colortext( "Looking for jmp/call esp.", textcolors.HEADER, 'print')
+     esp = commands.getoutput( "msfelfscan -j esp %s" % fpath )
      if eipch is not False:
           textcolors.colortext( "Starting exploit skeleton creation by creating pattern.", textcolors.HEADER, 'print')
 
@@ -72,6 +76,9 @@ def exdev( args,filename,buffer,fpath,eipch ):
                myfile.write('import os\n')
                myfile.write('from cfuzz import textcolors\n')
                myfile.write('\n')
+               myfile.write('\'\'\'EAX%s\'\'\'\n' % eax)
+               myfile.write('\'\'\'ESP%s\'\'\'\n' % esp)
+               myfile.write('\n')
                myfile.write('buffer = "A" * %s + "B" * 4 + "C" * (%s - %s - 4)' % (eipamtf,buffer,eipamtf))
                myfile.write('\n')
                myfile.write('\n')
@@ -94,6 +101,9 @@ def exdev( args,filename,buffer,fpath,eipch ):
                myfile.write('import os\n')
                myfile.write('from cfuzz import textcolors\n')
                myfile.write('\n')
+               myfile.write('\'\'\'EAX%s\'\'\'\n' % eax)
+               myfile.write('\'\'\'ESP%s\'\'\'\n' % esp)
+               myfile.write('\n')
                myfile.write('buffer = "A" * %s' % (buffer))
                myfile.write('\n')
                myfile.write('\n')
@@ -105,6 +115,10 @@ def exdev( args,filename,buffer,fpath,eipch ):
           textcolors.colortext( 'Exploit created in working directory as ./%s.py' % filename, textcolors.HEADER, 'print')
 
 def exdev2( args,filename,buffer,fpath,eipch ):
+     textcolors.colortext( "Looking for jmp/call eax.", textcolors.HEADER, 'print')
+     eax = commands.getoutput( "msfelfscan -j eax %s" % fpath )
+     textcolors.colortext( "Looking for jmp/call esp.", textcolors.HEADER, 'print')
+     esp = commands.getoutput( "msfelfscan -j esp %s" % fpath )
      if eipch is not False:
           textcolors.colortext( "Starting exploit skeleton creation by creating pattern.", textcolors.HEADER, 'print')
 
@@ -175,6 +189,9 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                myfile.write('from cfuzz import textcolors\n')
                myfile.write('from subprocess import Popen, PIPE, STDOUT\n')
                myfile.write('\n')
+               myfile.write('\'\'\'EAX%s\'\'\'\n' % eax)
+               myfile.write('\'\'\'ESP%s\'\'\'\n' % esp)
+               myfile.write('\n')
                myfile.write('buffer = "A" * %s + "B" * 4 + "C" * (%s-%s-4)' % (eipamtf,buffer,eipamtf))
                myfile.write('\n')
                myfile.write('\n')
@@ -199,6 +216,9 @@ def exdev2( args,filename,buffer,fpath,eipch ):
                myfile.write('import os\n')
                myfile.write('from cfuzz import textcolors\n')
                myfile.write('from subprocess import Popen, PIPE, STDOUT\n')
+               myfile.write('\n')
+               myfile.write('\'\'\'EAX%s\'\'\'\n' % eax)
+               myfile.write('\'\'\'ESP%s\'\'\'\n' % esp)
                myfile.write('\n')
                myfile.write('buffer = "A" * %s' % (buffer))
                myfile.write('\n')
