@@ -4,13 +4,13 @@ import argparse, os, sys, re, commands
 from cfuzz import stringf, stacka, exskele, textcolors
 from os.path import expanduser
 
-''' Directory checks '''
+#Directory checks
 if not os.path.isdir(os.path.join(os.path.expanduser('~'),'.cfuzz')):
      os.system("mkdir ~/.cfuzz")
 if not os.path.isdir(os.path.join(os.path.expanduser('~'),'.cfuzz/logs')):
      os.system("mkdir ~/.cfuzz/logs")
 
-''' Here we set up logging '''
+#Here we set up logging
 class Logger(object):
     def __init__(self):
         self.terminal = sys.stdout
@@ -28,12 +28,12 @@ class Logger(object):
 
 sys.stdout = Logger()
 
-''' Just a function that returns completion '''
+#Just a function that returns completion '''
 def completion():
-     ''' Signal Completion '''
+     #Signal Completion
      textcolors.colortext( "Execution completed.", textcolors.GREEN, 'print' )
 
-''' Start argument parsing '''
+#Start argument parsing
 parser = argparse.ArgumentParser(description='Fuzz C applications for String Format Overflows and Stack Overflows and create custom skeletons on findings.')
 parser.add_argument('progname', metavar='execname', type=str, nargs='+', help='A file to fuzz')
 parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
@@ -45,11 +45,11 @@ parser.add_argument("-s", help="Check for segmentation faults with string format
 parser.add_argument("-si", help="Check for segmentation faults with string format overflow in application input.", nargs='?', type=str, default=False, action="store", dest="sifield")
 parser.add_argument("-wE", help="Write an exploit skeleton.", type=str, default=False, action="store", dest="exfilename")
 parser.add_argument("-eip", help="Search for EIP as well.", default=False, action="store_true", dest="eip")
-parser.add_argument("-aslr", help="Disable or enable ASLR (Must be root).", default=False, action="store_true", dest="aslrcheck")
+parser.add_argument("-aslr", help="Disable or enable ASLR (Must be root). Will exit after asking.", default=False, action="store_true", dest="aslrcheck")
 parser.add_argument("-d", help="Add a delay.", type=float, default=False, action="store", dest="delay")
 args = parser.parse_args()
 
-'''Check for ASLR'''
+#Check for ASLR
 aslr1 = commands.getoutput("ldd %s | grep libc | cut -d'(' -f2 | cut -d')' -f1" % args.progname[0])
 aslr2 = commands.getoutput("ldd %s | grep libc | cut -d'(' -f2 | cut -d')' -f1" % args.progname[0])
 aslr3 = commands.getoutput("cat /proc/sys/kernel/randomize_va_space")
@@ -70,6 +70,7 @@ if args.aslrcheck:
             os.system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space")
         else:
             textcolors.colortext("Leaving ASLR enabled.", textcolors.GREEN, 'print')
+    exit(0)
 else:
     if aslr1 == aslr2 or aslr3 == 0:
         textcolors.colortext( "ASLR is disabled with %s." % aslr3, textcolors.GREEN, 'print' )
@@ -88,20 +89,20 @@ if args.afield is False and args.aifield is False and args.sfield is False and a
      textcolors.error('Must supply a scan type of -a, -ai, -s, or -si.',2,'print')
      exit(0)
 
-''' Set only 1 arg at a time '''
-if args.afield is not False and (args.aifield or args.sfield or args.sifield) is not False:
+#Set only 1 arg at a time
+if args.afield is not False and (args.aifield is not False or args.sfield is not False or args.sifield is not False):
     textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
     exit(0)
-if args.aifield is not False and (args.afield or args.sfield or args.sifield) is not False:
+if args.aifield is not False and (args.afield is not False or args.sfield is not False or args.sifield is not False):
     textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
     exit(0)
-if args.sfield is not False and (args.afield or args.aifield or args.sifield) is not False:
+if args.sfield is not False and (args.afield is not False or args.aifield is not False or args.sifield is not False):
     textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
     exit(0)
-if args.sifield is not False and (args.afield or args.afield or args.sfield) is not False:
+if args.sifield is not False and (args.afield is not False or args.aifield is not False or args.sfield is not False):
     textcolors.error('Can only do 1 scan type at a time.', 2, 'print' )
     exit(0)
-''' End Arg limiting'''
+#End Arg limiting
 
 if args.port and (args.port > 65535 or args.port <= 0):
      textcolors.error( "Error, port chosen out of range!", 3, 'print' )
@@ -130,14 +131,13 @@ if args.delay is not False:
      textcolors.colortext( "Running with %s second delay." % args.delay, textcolors.WARNING,'print')
 
 
-''' Setting up base variables '''
-#progname = sys.argv[1]
+#Setting up base variables
 progname = args.progname[0]
 buffer = ["A"]
 counter = 100
 segfault = 'False'
 
-''' Getting path prepared for execution and checks '''
+#Getting path prepared for execution and checks
 if '/' in progname:
      fpath = '%s' % progname
 else:
@@ -147,7 +147,7 @@ if not os.path.isfile(fpath):
      textcolors.error( 'File %s doesn\'t seem to exist' % progname, 2, 'print' )
      exit(0)
 
-''' Double check before execution and ensure file is an executable '''
+#Double check before execution and ensure file is an executable
 if os.access(fpath, os.X_OK):
      textcolors.colortext( 'Continue fuzzing file "%s"? [y/N]> ' % fpath, textcolors.GREEN )
      conf = raw_input(textcolors.colormsg)
@@ -163,19 +163,19 @@ else:
      textcolors.colortext( "Exiting %s" % sys.argv[0], textcolors.FAIL, 'print')
      exit(0)
 
-''' Fuzz begins here '''
+#Fuzz begins here
 textcolors.colortext( 'Starting Fuzz of "%s" now!' % fpath, textcolors.HEADER, 'print' )
 
-''' Clear latest-log to prepare for new entries - this log is for checking seg faults '''
+#Clear latest-log to prepare for new entries - this log is for checking seg faults
 with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'w+') as myfile:
      myfile.write('')
 
-''' Preparing fuzzing buffer '''
+#Preparing fuzzing buffer
 while len(buffer) <= 30:
      buffer.append("A"*counter)
      counter=counter+200
 
-''' Run a scan based on argument supplied.  We use try to output a special message on KeyExit '''
+#Run a scan based on argument supplied.  We use try to output a special message on KeyExit
 try:
      if args.sifield is not False:
           stringf.checkstrng( args.sifield, fpath, args.exfilename, args.delay )
@@ -190,7 +190,7 @@ try:
           elif args.sifield is not False or args.sifield is not False:
                pass
 
-          ''' Here we check to see if a segfault was detected '''
+          #Here we check to see if a segfault was detected
           with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'r') as myfile:
                for line in myfile:
                     if 'Segmentation fault' in line:
@@ -202,7 +202,7 @@ try:
                     continue
                break
 
-     ''' Check if -wE argument is true to create the stack based exploit skeleton '''
+     #Check if -wE argument is true to create the stack based exploit skeleton
      if args.exfilename is not False and args.afield is not False and segfault == 'True':
           exskele.exdev( args.afield,args.exfilename,buff,fpath,args.eip )
      if args.exfilename is not False and args.aifield is not False and segfault == 'True':

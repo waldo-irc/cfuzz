@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "-help" ] || [ "$1" == "--help" ] ||  [ "$1" == "-h" ]; then
+    echo "Basic install script.  Will install to /usr/bin by default."
+    echo "Install to custom directory with EX: ./setup.sh /root/bin."
+    exit 0
+fi
+
 if [ ! -d "/usr/lib/python2.7" ]; then
     echo "[x] Python 2.7 required."
     exit 0

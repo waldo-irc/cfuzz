@@ -6,17 +6,18 @@ Please use responsibly and with permission only. For educational purposes only.
 
 Now works with GDB peda effectively. 
 
-###Modules Include - 
-/usr/lib/python2.7/dist-packages/textcolors.py
+##INSTALLTION
+    git clone https://github.com/waldo-irc/cfuzz.git
+    ./setup.sh (will install to /usr/bin by default.  ./setup.sh /path/to/custom for another path)
+    And you're all set!
+
+###Modules Included in -
+/usr/lib/python2.7/dist-packages/
 
 Logs in ~/.cfuzz/logs
 
-Custom Modules in ~/.cfuzz/modules?
-
 ###Required Repos
 msf (msfvenom, pattern_create, pattern_offset)
-
-socat (hosting)
 
 ###ToDo
 Properly setup verbose error output and commenting + full logging of errors into output file
