@@ -6,9 +6,9 @@ Please use responsibly and with permission only. For educational purposes only.
 
 Now works with GDB peda effectively. 
 
-##INSTALLTION
-    git clone https://github.com/waldo-irc/cfuzz.git
-    ./setup.sh (will install to /usr/bin by default.  ./setup.sh /path/to/custom for another path)
+##INSTALLTION (will install to /usr/bin by default.  ./setup.sh /path/to/custom for another path)
+    git clone https://github.com/waldo-irc/cfuzz.git && cd cfuzz
+    ./setup.sh
     And you're all set!
 
 ###Modules Included in -
