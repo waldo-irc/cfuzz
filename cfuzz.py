@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import argparse, os, sys, re
+import argparse, os, sys, re, commands
 from cfuzz import stringf, stacka, exskele, textcolors
 from os.path import expanduser
 
@@ -45,8 +45,36 @@ parser.add_argument("-s", help="Check for segmentation faults with string format
 parser.add_argument("-si", help="Check for segmentation faults with string format overflow in application input.", nargs='?', type=str, default=False, action="store", dest="sifield")
 parser.add_argument("-wE", help="Write an exploit skeleton.", type=str, default=False, action="store", dest="exfilename")
 parser.add_argument("-eip", help="Search for EIP as well.", default=False, action="store_true", dest="eip")
+parser.add_argument("-aslr", help="Search for EIP as well.", default=False, action="store_true", dest="aslrcheck")
 parser.add_argument("-d", help="Add a delay.", type=float, default=False, action="store", dest="delay")
 args = parser.parse_args()
+
+'''Check for ASLR'''
+aslr1 = commands.getoutput("ldd %s | grep libc | cut -d'(' -f2 | cut -d')' -f1" % args.progname[0])
+aslr2 = commands.getoutput("ldd %s | grep libc | cut -d'(' -f2 | cut -d')' -f1" % args.progname[0])
+aslr3 = commands.getoutput("cat /proc/sys/kernel/randomize_va_space")
+if args.aslrcheck:
+    if aslr1 == aslr2 or aslr3 == 0:
+        textcolors.colortext("ASLR is disabled with %s" % aslr3, textcolors.GREEN, 'print')
+        textcolors.colortext("Enable ASLR? [y/N]: ", textcolors.GREEN)
+        ask = raw_input(textcolors.colormsg)
+        if ask.lower() == "yes" or ask.lower() == "y":
+            os.system("echo 2 | sudo tee /proc/sys/kernel/randomize_va_space")
+        else:
+            textcolors.colortext("Leaving ASLR disbled.", textcolors.GREEN, 'print')
+    else:
+        textcolors.colortext("ASLR is enabled with %s" % aslr3, textcolors.WARNING, 'print')
+        textcolors.colortext("Disable ASLR? [y/N]: ", textcolors.GREEN)
+        ask = raw_input(textcolors.colormsg)
+        if '%s' % ask.lower() == "yes" or '%s' % ask.lower() == "y":
+            os.system("echo 0 | sudo tee /proc/sys/kernel/randomize_va_space")
+        else:
+            textcolors.colortext("Leaving ASLR enabled.", textcolors.GREEN, 'print')
+else:
+    if aslr1 == aslr2 or aslr3 == 0:
+        textcolors.colortext( "ASLR is disabled with %s." % aslr3, textcolors.GREEN, 'print' )
+    else:
+        textcolors.colortext( "ASLR is enabled with %s." % aslr3, textcolors.WARNING, 'print' )
 
 if args.wipe:
      textcolors.colortext( "Wipings logs located at '~/.cfuzz/logs'", textcolors.HEADER, 'print' )
