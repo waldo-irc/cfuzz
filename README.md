@@ -6,7 +6,9 @@ Please use responsibly and with permission only. For educational purposes only.
 
 Now works with GDB peda effectively. 
 
-##INSTALLTION (will install to /usr/bin by default.  ./setup.sh /path/to/custom for another path)
+The included "cprogs" are vulnerable programs I found from CTF's/Googling to practice using this application on.  
+
+##INSTALLATION (will install to /usr/bin by default.  ./setup.sh /path/to/custom for another path)
     git clone https://github.com/waldo-irc/cfuzz.git && cd cfuzz
     ./setup.sh
     And you're all set!
@@ -14,7 +16,8 @@ Now works with GDB peda effectively.
 ###Modules Included in -
 /usr/lib/python2.7/dist-packages/
 
-Logs in ~/.cfuzz/logs
+###Logs Included in - 
+~/.cfuzz/logs
 
 ###Required Repos
 msf (msfvenom, pattern_create, pattern_offset)
