@@ -23,7 +23,7 @@ The included "cprogs" are vulnerable programs I found from CTF's/Googling to pra
 msf (msfvenom, pattern_create, pattern_offset)
 
 
-##Example RUn
+##Example Run
     root@kali:~# cfuzz vuln -a -eip -wE test
     [*] ASLR is enabled with 2.
     [*] Continue fuzzing file "./vuln"? [y/N]> y
