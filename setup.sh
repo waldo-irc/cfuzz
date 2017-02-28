@@ -13,11 +13,20 @@ else
     echo "Required modules already exist"
 fi
 
-if [ ! -f "/usr/bin/cfuzz" ]; then
-    echo "[-] Moving executable to bin."
-    cp ./cfuzz.py /usr/bin/cfuzz
+if [ -z "$1" ]; then
+    if [ ! -f "/usr/bin/cfuzz" ]; then
+        echo "[-] Moving executable to bin."
+        cp ./cfuzz.py /usr/bin/cfuzz
+    else
+        echo "Executable already exists."
+    fi
 else
-    echo "Executable already exists."
+    if [ ! -f "$1" ]; then
+        echo "[-] Moving executable to $1."
+        cp ./cfuzz.py "$1"/cfuzz
+    else
+        echo "Executable already exists."
+    fi
 fi
 
 if [ ! -d "~/.cfuzz" ]; then

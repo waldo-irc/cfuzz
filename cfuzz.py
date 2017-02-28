@@ -45,7 +45,7 @@ parser.add_argument("-s", help="Check for segmentation faults with string format
 parser.add_argument("-si", help="Check for segmentation faults with string format overflow in application input.", nargs='?', type=str, default=False, action="store", dest="sifield")
 parser.add_argument("-wE", help="Write an exploit skeleton.", type=str, default=False, action="store", dest="exfilename")
 parser.add_argument("-eip", help="Search for EIP as well.", default=False, action="store_true", dest="eip")
-parser.add_argument("-aslr", help="Search for EIP as well.", default=False, action="store_true", dest="aslrcheck")
+parser.add_argument("-aslr", help="Disable or enable ASLR (Must be root).", default=False, action="store_true", dest="aslrcheck")
 parser.add_argument("-d", help="Add a delay.", type=float, default=False, action="store", dest="delay")
 args = parser.parse_args()
 
