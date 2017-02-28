@@ -187,7 +187,7 @@ try:
                stacka.mainstack( fpath, args.afield, string, args.delay )
           elif args.aifield is not False:
                stacka.altstack( fpath, args.aifield, string, args.delay, args.host, args.port )
-          elif args.sifield is not False or args.sifield is not False:
+          elif args.sfield is not False or args.sifield is not False:
                pass
 
           #Here we check to see if a segfault was detected
