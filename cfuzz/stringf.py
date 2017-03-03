@@ -87,7 +87,7 @@ def checkstrng( args, fpath, skeleton, delay ):
 
 #          for xyz in range(3, 16):
           xyz = 2
-          while xyz <= 16:
+          while xyz <= 80:
                textcolors.colortext( "Hit enter to Continue with %s, change format with 'c', or enter anything else to quit > " % wcont.lower(), textcolors.GREEN )
                wconf = raw_input(textcolors.colormsg)
 
@@ -204,7 +204,7 @@ def checkstrngB( args, fpath, skeleton, delay ):
 
 #          for xyz in range(3, 16):
           xyz = 2
-          while xyz <= 16:
+          while xyz <= 80:
                textcolors.colortext( "Hit enter to Continue with %s, change format with 'c', or enter anything else to quit > " % wcont.lower(), textcolors.GREEN )
                wconf = raw_input(textcolors.colormsg)
 
