@@ -36,8 +36,8 @@ def completion():
 #Start argument parsing
 parser = argparse.ArgumentParser(description='Fuzz C applications for String Format Overflows and Stack Overflows and create custom skeletons on findings.')
 parser.add_argument('progname', metavar='execname', type=str, nargs='+', help='A file to fuzz')
-parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
-parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz', action="store")
+#parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
+#parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz', action="store")
 parser.add_argument("--wipe", help="Wipe logs for %(prog)s", default=False, action="store_true", dest='wipe')
 parser.add_argument("-a", help="Check for segmentation faults terminal arguments.", nargs='?', type=str, default=False, action="store", dest="afield")
 parser.add_argument("-ai", help="Check for segmentation faults in application input.", nargs='?', type=str, default=False, action="store", dest="aifield")
