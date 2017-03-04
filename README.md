@@ -4,7 +4,7 @@
 
 ##TOC
 
-1. ["Installation"]: https://github.com/waldo-irc/cfuzz#installation-will-install-to-usrbin-by-default--setupsh-pathtocustom-for-another-path
+1. [Installation](https://github.com/waldo-irc/cfuzz#installation-will-install-to-usrbin-by-default--setupsh-pathtocustom-for-another-path)
 
 2. (https://github.com/waldo-irc/cfuzz#usage "Standard usage")
 
