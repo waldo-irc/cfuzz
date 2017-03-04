@@ -10,7 +10,11 @@
 
 3. [Usage on stack based attacks](https://github.com/waldo-irc/cfuzz#example-run)
 
+     *[Exploit Skeleton Example](https://github.com/waldo-irc/cfuzz#skeleton)
+
 4. [Format string attacks](https://github.com/waldo-irc/cfuzz#format-string-attacks)
+
+     *[Exploit Skeleton Example](https://github.com/waldo-irc/cfuzz#skeleton-1)
 
 <br />
 
