@@ -36,7 +36,7 @@ def completion():
 #Start argument parsing
 parser = argparse.ArgumentParser(description='Fuzz C applications for String Format Overflows and Stack Overflows and create custom skeletons on findings.')
 parser.add_argument('progname', metavar='execname', type=str, nargs='+', help='A file to fuzz')
-parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it (coming soon).', action="store")
+parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself, =host to have cfuzz do it, =remote to fuzzer remotely (coming soon)', action="store")
 parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz (coming soon)', action="store")
 parser.add_argument("--wipe", help="Wipe logs for %(prog)s", default=False, action="store_true", dest='wipe')
 parser.add_argument("-a", help="Check for segmentation faults terminal arguments.", nargs='?', type=str, default=False, action="store", dest="afield")
@@ -117,10 +117,10 @@ if args.port and (args.port > 65535 or args.port <= 0):
      exit(0)
 
 if args.host is not False:
-     if args.host.lower() == 'run' or args.host.lower() == 'host':
+     if args.host.lower() == 'run' or args.host.lower() == 'host' or args.host.lower() == 'remote':
           pass
      else:
-          textcolors.error( "Host argument must be =run or =host.", 2, 'print' )
+          textcolors.error( "Host argument must be =run, =host, or =remote.", 2, 'print' )
           exit(0)
 
 if args.host is not False and args.port is False:
