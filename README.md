@@ -21,6 +21,7 @@ The included "cprogs" are vulnerable programs I found from CTF's/Googling to pra
 
 ###Required Repos
 msf (msfelfscan, pattern_create, pattern_offset)
+gdb (GNU Debugger)
 
 ##Usage
     usage: cfuzz [-h] [--host= HOST] [--port= PORT] [--wipe] [-a [AFIELD]]
