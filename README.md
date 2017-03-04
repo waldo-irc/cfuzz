@@ -22,6 +22,36 @@ The included "cprogs" are vulnerable programs I found from CTF's/Googling to pra
 ###Required Repos
 msf (msfelfscan, pattern_create, pattern_offset)
 
+##Usage
+    usage: cfuzz [-h] [--host= HOST] [--port= PORT] [--wipe] [-a [AFIELD]]
+                 [-ai [AIFIELD]] [-s [SFIELD]] [-si [SIFIELD]] [-wE EXFILENAME]
+                 [-eip] [-aslr] [-d DELAY] [-v]
+                 execname [execname ...]
+
+    Fuzz C applications for String Format Overflows and Stack Overflows and create
+    custom skeletons on findings.
+
+    positional arguments:
+      execname        A file to fuzz
+
+    optional arguments:
+      -h, --help      show this help message and exit
+      --host= HOST    A host to fuzz, either =run to have the program do it itself
+                      or =host to have cfuzz do it (coming soon).
+      --port= PORT    A port to fuzz (coming soon)
+      --wipe          Wipe logs for cfuzz
+      -a [AFIELD]     Check for segmentation faults terminal arguments.
+      -ai [AIFIELD]   Check for segmentation faults in application input.
+      -s [SFIELD]     Check for segmentation faults with string format overflow
+                      using terminal arguments.
+      -si [SIFIELD]   Check for segmentation faults with string format overflow in
+                      application input.
+      -wE EXFILENAME  Write an exploit skeleton.
+      -eip            Search for EIP as well.
+      -aslr           Disable or enable ASLR (Must be root). Will exit after
+                      asking.
+      -d DELAY        Add a delay.
+      -v              Add verbosity.
 
 ##Example Run
     root@kali:~# cfuzz vuln -a -eip -wE test
