@@ -6,11 +6,11 @@
 
 1. [Installation](https://github.com/waldo-irc/cfuzz#installation-will-install-to-usrbin-by-default--setupsh-pathtocustom-for-another-path)
 
-2. (https://github.com/waldo-irc/cfuzz#usage "Standard usage")
+2. [Standard usage](https://github.com/waldo-irc/cfuzz#usage)
 
-3. (https://github.com/waldo-irc/cfuzz#example-run "Usage on stack based attacks")2. (https://github.com/waldo-irc/cfuzz#usage "Usage on stack based attacks")
+3. [Usage on stack based attacks](https://github.com/waldo-irc/cfuzz#example-run)
 
-4. (https://github.com/waldo-irc/cfuzz#format-string-attacks "Format string attacks")
+4. [Format string attacks](https://github.com/waldo-irc/cfuzz#format-string-attacks)
 
 <br />
 
