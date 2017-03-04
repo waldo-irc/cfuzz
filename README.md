@@ -2,6 +2,18 @@
 ##A C Application fuzzer built in python.
 ####Current version requires python 2.7.  May work with newer versions, currently untested.
 
+##TOC
+
+1. (https://github.com/waldo-irc/cfuzz#installation-will-install-to-usrbin-by-default--setupsh-pathtocustom-for-another-path "Installation")
+
+2. (https://github.com/waldo-irc/cfuzz#usage "Standard usage")
+
+3. (https://github.com/waldo-irc/cfuzz#example-run "Usage on stack based attacks")2. (https://github.com/waldo-irc/cfuzz#usage "Usage on stack based attacks")
+
+4. (https://github.com/waldo-irc/cfuzz#format-string-attacks "Format string attacks")
+
+<br />
+
 Please use responsibly and with permission only. For educational purposes only.
 
 Now works with GDB peda effectively. 
