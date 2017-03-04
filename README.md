@@ -62,6 +62,7 @@ gdb (GNU Debugger)
     [*] Starting Fuzz of "./vuln" now!
     [*] Fuzzing with 1 bytes
     [*] Fuzzing with 100 bytes
+    [*] Fuzzing with 200 bytes
     [*] Fuzzing with 300 bytes
     [*] [✓✓✓] Seg Fault seems to have occured at 300 bytes!
     [*] Looking for jmp/call eax.
