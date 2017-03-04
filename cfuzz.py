@@ -36,8 +36,8 @@ def completion():
 #Start argument parsing
 parser = argparse.ArgumentParser(description='Fuzz C applications for String Format Overflows and Stack Overflows and create custom skeletons on findings.')
 parser.add_argument('progname', metavar='execname', type=str, nargs='+', help='A file to fuzz')
-#parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
-#parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz', action="store")
+parser.add_argument('--host=', dest='host', type=str, default=False, help='A host to fuzz, either =run to have the program do it itself or =host to have cfuzz do it.', action="store")
+parser.add_argument('--port=', dest='port', type=int, default=False, help='A port to fuzz', action="store")
 parser.add_argument("--wipe", help="Wipe logs for %(prog)s", default=False, action="store_true", dest='wipe')
 parser.add_argument("-a", help="Check for segmentation faults terminal arguments.", nargs='?', type=str, default=False, action="store", dest="afield")
 parser.add_argument("-ai", help="Check for segmentation faults in application input.", nargs='?', type=str, default=False, action="store", dest="aifield")
@@ -47,7 +47,15 @@ parser.add_argument("-wE", help="Write an exploit skeleton.", type=str, default=
 parser.add_argument("-eip", help="Search for EIP as well.", default=False, action="store_true", dest="eip")
 parser.add_argument("-aslr", help="Disable or enable ASLR (Must be root). Will exit after asking.", default=False, action="store_true", dest="aslrcheck")
 parser.add_argument("-d", help="Add a delay.", type=float, default=False, action="store", dest="delay")
+parser.add_argument("-v", help="Add verbosity.", default=False, action="store_true", dest="verbose")
 args = parser.parse_args()
+
+#UNAVAILABLE TILL LATER
+if args.host or args.port:
+    textcolors.colortext("Not available yet.", textcolors.FAIL, 'print')
+    exit(0)
+if args.verbose:
+    textcolors.colortext("Verbosity only works with stack based BOF currently.", textcolors.WARNING, 'print')
 
 #Check for ASLR
 aslr1 = commands.getoutput("ldd %s | grep libc | cut -d'(' -f2 | cut -d')' -f1" % args.progname[0])
@@ -79,7 +87,7 @@ else:
 
 if args.wipe:
      textcolors.colortext( "Wipings logs located at '~/.cfuzz/logs'", textcolors.HEADER, 'print' )
-     os.system("echo '' > ~/.cfuzz/logs/log.txt; echo '' > ~/.cfuzz/logs/latest-log.txt ")
+     os.system("echo '' > ~/.cfuzz/logs/log.txt; echo '' > ~/.cfuzz/logs/latest-log.txt; echo '' >  ~/.cfuzz/logs/verbose.txt")
 
 if args.delay is not False and args.afield is False and args.aifield is False and args.sfield is False and args.sifield is False:
      textcolors.error( "Delay requires an argument of -a, -ai, -s, or -si." ,1,'print' )
@@ -171,9 +179,9 @@ with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'w
      myfile.write('')
 
 #Preparing fuzzing buffer
-while len(buffer) <= 30:
-     buffer.append("A"*counter)
-     counter=counter+200
+while len(buffer) <= 100:
+     buffer.append("\x41"*counter)
+     counter=counter+100
 
 #Run a scan based on argument supplied.  We use try to output a special message on KeyExit
 try:
@@ -184,9 +192,9 @@ try:
 
      for string in buffer:
           if args.afield is not False:
-               stacka.mainstack( fpath, args.afield, string, args.delay )
+               stacka.mainstack( fpath, args.afield, string, args.delay, args.verbose )
           elif args.aifield is not False:
-               stacka.altstack( fpath, args.aifield, string, args.delay, args.host, args.port )
+               stacka.altstack( fpath, args.aifield, string, args.delay, args.verbose,  args.host, args.port )
           elif args.sfield is not False or args.sifield is not False:
                pass
 
@@ -215,9 +223,13 @@ try:
      elif args.eip is not False and segfault == 'True' and args.exfilename is False and args.aifield is not False:
           stacka.stackeipcheckB( fpath, buff )
 
+     if args.verbose is True:
+          os.system("echo '' >> ~/.cfuzz/logs/verbose.txt")
+
      completion()
      exit(0)
 
 except KeyboardInterrupt:
      print '\n'
      textcolors.colortext( "Exit key detected, closing %s." % sys.argv[0],textcolors.FAIL,'print')
+

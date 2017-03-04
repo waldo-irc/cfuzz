@@ -126,18 +126,30 @@ def stackeipcheckB( fpath, buff ):
      if "#source ~/peda/peda.py" in peda:
           os.system("sed -i -e 's/#source ~\/peda\/peda.py/source ~\/peda\/peda.py/g' ~/.gdbinit")
 
-def mainstack( fpath, args, string, waittime ):
+def mainstack( fpath, args, string, waittime, verbose ):
      textcolors.colortext( "Fuzzing with %s bytes" % len(string), textcolors.BLUE, 'print' )
      if args is None:
           run = Popen("%s %s >> ~/.cfuzz/logs/latest-log.txt 2>&1" % (fpath, string), shell=True, stderr=STDOUT, stdin=PIPE, stdout=PIPE)
      else:
           run = Popen("%s %s %s >> ~/.cfuzz/logs/latest-log.txt 2>&1" % (fpath, args, string), shell=True, stderr=STDOUT, stdin=PIPE, stdout=PIPE)
+
+     if verbose is True:
+          if args is None:
+              com = "%s %s" % (fpath, string)
+              os.system('echo ' + '\'' + com + '\'' + ' >> ~/.cfuzz/logs/verbose.txt')
+          else:
+              com = "%s %s %s" % (fpath, args, string)
+              os.system('echo ' + '\'' + com + '\'' + ' >> ~/.cfuzz/logs/verbose.txt')
+          verbosity = Popen("tail -1 ~/.cfuzz/logs/latest-log.txt | tee -a ~/.cfuzz/logs/verbose.txt", shell=True, stderr=STDOUT, stdin=PIPE, stdout=PIPE)
+          print com
+          print verbosity.stdout.read()
+
      if waittime is False:
           sleep(.1)
      else:
           sleep(waittime)
 
-def altstack( fpath, args, string, waittime, host, port ):
+def altstack( fpath, args, string, waittime, verbose, host, port ):
 #def altstack( fpath, args, string, waittime ):
      if host is not False:
           print 'True!'
@@ -158,3 +170,15 @@ def altstack( fpath, args, string, waittime, host, port ):
 
           with open(os.path.join(os.path.expanduser('~'),'.cfuzz/logs/latest-log.txt'), 'w+') as myfile:
                myfile.write(grep_stdout.decode())
+
+          if verbose is True:
+               if args is None:
+                    com = "%s < %s" % (fpath, string)
+                    os.system('echo ' + '\'' + com + '\'' + ' >> ~/.cfuzz/logs/verbose.txt')
+               else:
+                    com = "%s < %s %s" % (fpath, args, string)
+                    os.system('echo ' + '\'' + com + '\'' + ' >> ~/.cfuzz/logs/verbose.txt')
+               verbosity = Popen("tail -1 ~/.cfuzz/logs/latest-log.txt | tee -a ~/.cfuzz/logs/verbose.txt", shell=True, stderr=STDOUT, stdin=PIPE, stdout=PIPE)
+               print com
+               print verbosity.stdout.read()
+

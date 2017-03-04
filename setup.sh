@@ -39,7 +39,6 @@ if [ ! -d "~/.cfuzz" ]; then
     echo "[-] Setting up user logs and directories in '~/.cfuzz'."
     mkdir ~/.cfuzz
     mkdir ~/.cfuzz/logs
-    mkdir ~/.cfuzz/modules
 else
     echo "Personal directories already setup."
 fi
